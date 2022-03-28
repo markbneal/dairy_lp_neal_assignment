@@ -1,0 +1,64 @@
+B 2 C o m p i l a t i o n
+B 262 Include File Summary
+B 277 Equation Listing    SOLVE DairyFarm Using LP From line 240
+D 278 ObjFunction
+D 285 AreaSum
+D 291 PastUse
+D 314 ME
+D 341 MilkLitres
+D 360 FertLimit
+D 373 GrainLimit
+D 392 QuotaLimit
+D 403 MaxLitres
+D 422 LabourLimit
+D 442 CashLimit
+D 483 OverdraftLimit
+D 494 CowsEqual
+D 505 CowsLimit
+D 510 FixedCostsLimit
+B 517 Column Listing      SOLVE DairyFarm Using LP From line 240
+E 518 PastureArea
+E 553 Fertiliser
+E 592 PastMEToAvailME
+E 616 Grain
+E 643 AvailMEToMilk
+E 670 MilkToMkt
+E 697 MilkToMan
+E 720 NumberCows
+E 764 FixedCosts
+E 775 HireLab
+E 798 CashTransfer
+E 821 Overdraft
+E 848 Objective
+B 857 Model Statistics    SOLVE DairyFarm Using LP From line 240
+B 873 Solution Report     SOLVE DairyFarm Using LP From line 240
+F 919 ObjFunction
+F 923 AreaSum
+F 931 PastUse
+F 948 ME
+F 957 MilkLitres
+F 966 FertLimit
+F 974 GrainLimit
+F 983 QuotaLimit
+F 992 MaxLitres
+F 1001 LabourLimit
+F 1010 CashLimit
+F 1019 OverdraftLimit
+F 1028 CowsEqual
+F 1037 CowsLimit
+F 1041 FixedCostsLimit
+G 1044 PastureArea
+G 1052 Fertiliser
+G 1060 PastMEToAvailME
+G 1077 Grain
+G 1086 AvailMEToMilk
+G 1095 MilkToMkt
+G 1104 MilkToMan
+G 1113 NumberCows
+G 1122 FixedCosts
+G 1128 HireLab
+G 1137 CashTransfer
+G 1146 Overdraft
+G 1155 Objective
+B 1168 E x e c u t i o n
+I 1169 PastureArea

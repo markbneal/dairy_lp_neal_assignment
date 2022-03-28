@@ -1,0 +1,1191 @@
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 1
+An LP of a dairy farm (Neal, 1999)
+C o m p i l a t i o n
+
+
+   2   
+   3  ***OPTIONS***
+   4   
+   5  option limrow = 4;
+   6  option limcol = 4;
+   7  option lp = conopt;
+   8   
+   9  ***SETS***
+  10   
+  11  Set s Seasons / Summer, Autumn, Winter, Spring /;
+  12  Set p Pastures / Kikuyu, Lucerne, Rye /;
+  13  Set g Grain / Maize /;
+  14  Set m OtherMilkPrices / ManMilkPrice /;
+  15   
+  16  ***DATA***
+  17  *** Pastures and Fertiliser
+  18   
+  19  Scalar  TotalArea        Total area of land available (ha)   / 150 /;
+  20   
+  21   
+  22  * Here is an example of reading data from an excel file saved in csv
+  23  Table PG(s,p)  Pasture growth (ME units?)
+INCLUDE    C:\Documents and Settings\Neal\My Documents\gamsdir\PG.csv
+  26  PG,Kikuyu,Lucerne,Rye
+  27  Summer,9000,11025,9000
+  28  Autumn,4500,7200,4500
+  29  Winter,4500,7200,12375
+  30  Spring,9750,11025,7875
+  32   
+  33  *                   Kikuyu        Lucerne           Rye
+  34  *         Summer      9000          11025          9000
+  35  *         Autumn      4500           7200          4500
+  36  *         Winter      4500           7200         12375
+  37  *         Spring      9750          11025          7875;
+  38   
+  39  Table LP(s,p)  Labour use for pasture (hrs per ha)
+  40   
+  41                     Kikuyu        Lucerne           Rye
+  42           Summer        0.             0.            0.
+  43           Autumn        0.             5             5
+  44           Winter        0.             0.            0.
+  45           Spring        0.             0.            0.;
+  46   
+  47  Table CP(s,p)  Cash use for pasture (dol per ha)
+  48   
+  49                     Kikuyu        Lucerne           Rye
+  50           Summer        0.             0.            0.
+  51           Autumn        0.           250            250
+  52           Winter        0.             0.            0.
+  53           Spring        0.             0.            0.;
+  54   
+  55  Table F(s,p)  Fert Response (ME per kg)
+  56   
+  57                     Kikuyu        Lucerne           Rye
+  58           Summer      17.5           21.4          17.5
+  59           Autumn       8.7           13.9           8.7
+  60           Winter       8.7           13.9          24.0
+  61           Spring      18.9           21.4          15.3;
+  62   
+  63  Table LF(s,p)  Labour use for fert (hrs per kg)
+  64   
+  65                     Kikuyu        Lucerne           Rye
+  66           Summer     0.005          0.005           0.
+  67           Autumn     0.             0.              0.
+  68           Winter     0.             0.            0.005
+  69           Spring     0.005          0.005         0.005;
+  70   
+  71  Table CF(s,p)  Cash use for fert (dol per kg)
+  72   
+  73                     Kikuyu        Lucerne           Rye
+  74           Summer       0.2            0.2           0.
+  75           Autumn       0.             0.            0.
+  76           Winter       0.             0.            0.2
+  77           Spring       0.2            0.2           0.2;
+  78   
+  79  *** Grain and hay
+  80   
+  81  Table CG(s,g)  Cash use for grain (dol per kg)
+  82   
+  83                      Maize
+  84           Summer       195
+  85           Autumn       200
+  86           Winter       205
+  87           Spring       210;
+  88   
+  89  Scalar MaxFert     Maximum amount of Fertiliser (kg per ha)     / 750 /;
+  90   
+  91  *** Milk and ME
+  92   
+  93  Scalar MEPerL      Met Energy per Litre         (ME per L)     / 4.76 /;
+  94   
+  95  Scalar MktMilk     Market milk price            (Dol per L)    / 0.47 /;
+  96   
+  97  Table OtherMilkPrices(s,m)  Other (inc Manufacturing) milk prices  (Dol pe
+      r L)
+  98   
+  99                   ManMilkPrice
+ 100           Summer          0.20
+ 101           Autumn          0.27
+ 102           Winter          0.31
+ 103           Spring          0.26;
+ 104   
+ 105  Scalar MEMaint      Met Energy for Maint         (ME per cow)  / 13440 /;
+ 106   
+ 107  Scalar MaxGrain     Maximum amount of grain      (kg per cow)    / 720 /;
+ 108   
+ 109  Scalar MaxLPerCow   Maximum litres per cow       (L per cow)    / 3240 /;
+ 110   
+ 111  Scalar LC           Labour per cow               (hours per cow) / 6.6 /;
+ 112   
+ 113  Scalar CC           Cash costs per cow           (dol per cow) / 111.6 /;
+ 114   
+ 115   
+ 116  ***Costs, constraints and RHS
+ 117   
+ 118  Scalar LabCost      Cost of hired labour         (dol per hour)   / 15 /;
+ 119   
+ 120  Scalar OwnLab       Owner labour       (hours per season)       / 1440 /;
+ 121   
+ 122  Scalar FixCosts     Fixed farm costs   (dol per season)        / 12000 /;
+ 123   
+ 124  Scalar OpCash       Opening cash                 (dol)         / 40000 /;
+ 125   
+ 126  Scalar MaxOD        Maximum overdraft            (dol)         / 60000 /;
+ 127   
+ 128  Scalar Quota        Quota per season   (L per season)         / 200000 /;
+ 129   
+ 130  Scalar MaxCows      Maximum number of cows       (cows)          / 450 /;
+ 131   
+ 132  Scalar ODInt        Overdraft interest (1 plus (i per season))  / 1.03 /;
+ 133   
+ 134  Scalar kgT          Kilograms in a tonne         (1000)         / 1000 /;
+ 135   
+ 136  Scalar MET          ME in a tonne of grain       (ME per t)     / 8000 /;
+ 137   
+ 138  ***VARIABLES***
+ 139   
+ 140  Variables        PastureArea(p)        PastureArea planted to pasture(p)  
+       (ha)
+ 141                   Fertiliser(p)         Fertiliser on pasture(p)           
+       (kg?)
+ 142                   PastMEToAvailME(s,p)  Transfer pasture ME to available ME
+       (ME)
+ 143                   Grain(s)              Grain in season(s)                 
+       (t)
+ 144                   AvailMEToMilk(s)      Avalaible ME transfered to milk    
+       (ME)
+ 145                   MilkToMkt(s)          Milk transferred to market         
+       (L)
+ 146                   MilkToMan(s)          Milk transferred to manufacturing  
+       (L)
+ 147                   NumberCows(s)         Number of cows in season(s)        
+       (cows)
+ 148                   FixedCosts            Fixed costs                        
+       (dol)
+ 149                   HireLab(s)            Hire of labour in season(s)        
+       (hours)
+ 150                   CashTransfer(s)       Transfer of cash between seasons   
+       (dol)
+ 151                   Overdraft(s)          Overdraft and transfers (s)        
+       (dol)
+ 152                   Objective             Value of final cash balance        
+       ($)
+ 153  ;
+ 154   
+ 155  Positive Variables
+ 156                   PastureArea(p)
+ 157                   Fertiliser(p)
+ 158                   PastMEToAvailME(s,p)
+ 159                   Grain(s)
+ 160                   AvailMEToMilk(s)
+ 161                   MilkToMkt(s)
+ 162                   MilkToMan(s)
+ 163                   NumberCows(s)
+ 164                   FixedCosts
+ 165                   HireLab(s)
+ 166                   CashTransfer(s)
+ 167                   Overdraft(s)
+ 168  ;
+ 169   
+ 170  ***EQUATIONS***
+ 171   
+ 172  Equations  ObjFunction(s) ObjectiveFunction -> max final cash balance
+ 173             AreaSum       PastureArea must be less than TotalArea
+ 174             PastUse(s,p)  Kikuyu production and use
+ 175             ME(s)         ME balance
+ 176             MilkLitres(s) Milk Balance
+ 177             FertLimit(p)  Fertiliser Balance
+ 178             GrainLimit(s) Grain Balance
+ 179             QuotaLimit(s) Quota Balance
+ 180             MaxLitres(s)  Limit on production per cow
+ 181             LabourLimit(s) Labour Balance
+ 182             CashLimit(s)  Cash Balance
+ 183             OverdraftLimit(s) Overdraft limit
+ 184             CowsEqual(s)  Cows equal in all seasons
+ 185             CowsLimit(s)     Not more than a certain number of cows
+ 186             FixedCostsLimit Fixed costs equal one
+ 187  ;
+ 188   
+ 189  ObjFunction(s)..
+ 190    CashTransfer(s)$(ord(s)=card(s)) - ODInt*Overdraft(s)$(ord(s)=card(s))
+ 191                                       =e= Objective$(ord(s)=card(s));
+ 192  AreaSum..
+ 193    sum(p, PastureArea(p))                                  =l= TotalArea;
+ 194  PastUse(s,p)..
+ 195    - PastureArea(p)  * PG(s,p)
+ 196    - Fertiliser(p)   * F(s,p)
+ 197    + PastMEToAvailME(s,p)                                 =l= 0;
+ 198  ME(s)..
+ 199    - sum(p,PastMEToAvailME(s,p)) - Grain(s) * MET
+ 200    + AvailMEToMilk(s) * MEPerL  + NumberCows(s)* MEMaint   =l= 0;
+ 201  MilkLitres(s)..
+ 202    - AvailMEToMilk(s) + MilkToMkt(s) + MilkToMan(s)        =l= 0;
+ 203  FertLimit(p)..
+ 204    - PastureArea(p)  * MaxFert + Fertiliser(p)             =l= 0;
+ 205  GrainLimit(s)..
+ 206    Grain(s) * kgT    - NumberCows(s) * MaxGrain            =l= 0;
+ 207  QuotaLimit(s)..
+ 208    MilkToMkt(s)                                            =l= Quota;
+ 209  MaxLitres(s)..
+ 210    AvailMEToMilk(s)   - NumberCows(s) * MaxLPerCow         =l= 0;
+ 211   
+ 212  LabourLimit(s)..
+ 213    Sum(p, PastureArea(p)  * LP(s,p))
+ 214    + Sum(p, Fertiliser(p)   * LF(s,p))
+ 215    + NumberCows(s) * LC  - HireLab(s)                      =l= OwnLab;
+ 216   
+ 217  CashLimit(s)..
+ 218    Sum(p, PastureArea(p)  * CP(s,p))
+ 219    + Sum(p, Fertiliser(p)   * CF(s,p))
+ 220    + sum(g, Grain(s) * CG(s, g)) + NumberCows(s) * CC
+ 221    - MilkToMkt(s) * MktMilk
+ 222    - sum(m, MilkToMan(s) * OtherMilkPrices(s, m)) + FixedCosts * Fixcosts
+ 223    + HireLab(s) * LabCost
+ 224    + CashTransfer(s)        - CashTransfer(s-1)$(ord(s) > 1)
+ 225    - Overdraft(s)           + Overdraft(s-1)$(ord(s) > 1)*ODInt
+ 226                                              =l= (ord(s) = 1)*OpCash;
+ 227  OverdraftLimit(s)..
+ 228    Overdraft(s)                                            =l= MaxOD;
+ 229  CowsEqual(s)..
+ 230    NumberCows(s) - NumberCows(s--1)                        =e= 0;
+ 231  CowsLimit(s)..
+ 232    NumberCows(s)$(ord(s)=card(s))                          =l= MaxCows;
+ 233  FixedCostsLimit..
+ 234    FixedCosts                                              =e= 1;
+ 235   
+ 236  ***MODEL AND SOLVE***
+ 237   
+ 238  Model DairyFarm  / All / ;
+ 239   
+ 240  Solve DairyFarm using lp maximizing Objective;
+ 241   
+ 242   
+ 243  Display PastureArea.l;
+ 244   
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 2
+An LP of a dairy farm (Neal, 1999)
+Include File Summary
+
+
+   SEQ   GLOBAL TYPE      PARENT   LOCAL  FILENAME
+
+     1        1 INPUT          0       0  C:\Documents and Settings\Neal\My Docu
+                                          ments\gamsdir\Clareview Dairy Linear P
+                                          rogram.gms
+     2       25 INCLUDE        1      25  .C:\Documents and Settings\Neal\My Doc
+                                           uments\gamsdir\PG.csv
+
+
+COMPILATION TIME     =        0.015 SECONDS      3 Mb  WIN221-144 Mar 14, 2006
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 3
+An LP of a dairy farm (Neal, 1999)
+Equation Listing    SOLVE DairyFarm Using LP From line 240
+
+
+---- ObjFunction  =E=  ObjectiveFunction -> max final cash balance
+
+ObjFunction(Spring)..  CashTransfer(Spring) - 1.03*Overdraft(Spring) - Objective
+      =E= 0 ; (LHS = 0)
+     
+
+---- AreaSum  =L=  PastureArea must be less than TotalArea
+
+AreaSum..  PastureArea(Kikuyu) + PastureArea(Lucerne) + PastureArea(Rye) =L= 150
+      ; (LHS = 0)
+     
+
+---- PastUse  =L=  Kikuyu production and use
+
+PastUse(Summer,Kikuyu)..  - 9000*PastureArea(Kikuyu) - 17.5*Fertiliser(Kikuyu)
+     
+      + PastMEToAvailME(Summer,Kikuyu) =L= 0 ; (LHS = 0)
+     
+PastUse(Summer,Lucerne)..  - 11025*PastureArea(Lucerne)
+     
+      - 21.4*Fertiliser(Lucerne) + PastMEToAvailME(Summer,Lucerne) =L= 0 ;
+     
+      (LHS = 0)
+     
+PastUse(Summer,Rye)..  - 9000*PastureArea(Rye) - 17.5*Fertiliser(Rye)
+     
+      + PastMEToAvailME(Summer,Rye) =L= 0 ; (LHS = 0)
+     
+PastUse(Autumn,Kikuyu)..  - 4500*PastureArea(Kikuyu) - 8.7*Fertiliser(Kikuyu)
+     
+      + PastMEToAvailME(Autumn,Kikuyu) =L= 0 ; (LHS = 0)
+     
+REMAINING 8 ENTRIES SKIPPED
+
+
+---- ME  =L=  ME balance
+
+ME(Summer)..  - PastMEToAvailME(Summer,Kikuyu) - PastMEToAvailME(Summer,Lucerne)
+     
+      - PastMEToAvailME(Summer,Rye) - 8000*Grain(Summer)
+     
+      + 4.76*AvailMEToMilk(Summer) + 13440*NumberCows(Summer) =L= 0 ; (LHS = 0)
+     
+ME(Autumn)..  - PastMEToAvailME(Autumn,Kikuyu) - PastMEToAvailME(Autumn,Lucerne)
+     
+      - PastMEToAvailME(Autumn,Rye) - 8000*Grain(Autumn)
+     
+      + 4.76*AvailMEToMilk(Autumn) + 13440*NumberCows(Autumn) =L= 0 ; (LHS = 0)
+     
+ME(Winter)..  - PastMEToAvailME(Winter,Kikuyu) - PastMEToAvailME(Winter,Lucerne)
+     
+      - PastMEToAvailME(Winter,Rye) - 8000*Grain(Winter)
+     
+      + 4.76*AvailMEToMilk(Winter) + 13440*NumberCows(Winter) =L= 0 ; (LHS = 0)
+     
+ME(Spring)..  - PastMEToAvailME(Spring,Kikuyu) - PastMEToAvailME(Spring,Lucerne)
+     
+      - PastMEToAvailME(Spring,Rye) - 8000*Grain(Spring)
+     
+      + 4.76*AvailMEToMilk(Spring) + 13440*NumberCows(Spring) =L= 0 ; (LHS = 0)
+     
+
+---- MilkLitres  =L=  Milk Balance
+
+MilkLitres(Summer)..  - AvailMEToMilk(Summer) + MilkToMkt(Summer)
+     
+      + MilkToMan(Summer) =L= 0 ; (LHS = 0)
+     
+MilkLitres(Autumn)..  - AvailMEToMilk(Autumn) + MilkToMkt(Autumn)
+     
+      + MilkToMan(Autumn) =L= 0 ; (LHS = 0)
+     
+MilkLitres(Winter)..  - AvailMEToMilk(Winter) + MilkToMkt(Winter)
+     
+      + MilkToMan(Winter) =L= 0 ; (LHS = 0)
+     
+MilkLitres(Spring)..  - AvailMEToMilk(Spring) + MilkToMkt(Spring)
+     
+      + MilkToMan(Spring) =L= 0 ; (LHS = 0)
+     
+
+---- FertLimit  =L=  Fertiliser Balance
+
+FertLimit(Kikuyu)..  - 750*PastureArea(Kikuyu) + Fertiliser(Kikuyu) =L= 0 ;
+     
+      (LHS = 0)
+     
+FertLimit(Lucerne)..  - 750*PastureArea(Lucerne) + Fertiliser(Lucerne) =L= 0 ;
+     
+      (LHS = 0)
+     
+FertLimit(Rye)..  - 750*PastureArea(Rye) + Fertiliser(Rye) =L= 0 ; (LHS = 0)
+     
+
+---- GrainLimit  =L=  Grain Balance
+
+GrainLimit(Summer)..  1000*Grain(Summer) - 720*NumberCows(Summer) =L= 0 ;
+     
+      (LHS = 0)
+     
+GrainLimit(Autumn)..  1000*Grain(Autumn) - 720*NumberCows(Autumn) =L= 0 ;
+     
+      (LHS = 0)
+     
+GrainLimit(Winter)..  1000*Grain(Winter) - 720*NumberCows(Winter) =L= 0 ;
+     
+      (LHS = 0)
+     
+GrainLimit(Spring)..  1000*Grain(Spring) - 720*NumberCows(Spring) =L= 0 ;
+     
+      (LHS = 0)
+     
+
+---- QuotaLimit  =L=  Quota Balance
+
+QuotaLimit(Summer)..  MilkToMkt(Summer) =L= 200000 ; (LHS = 0)
+     
+QuotaLimit(Autumn)..  MilkToMkt(Autumn) =L= 200000 ; (LHS = 0)
+     
+QuotaLimit(Winter)..  MilkToMkt(Winter) =L= 200000 ; (LHS = 0)
+     
+QuotaLimit(Spring)..  MilkToMkt(Spring) =L= 200000 ; (LHS = 0)
+     
+
+---- MaxLitres  =L=  Limit on production per cow
+
+MaxLitres(Summer)..  AvailMEToMilk(Summer) - 3240*NumberCows(Summer) =L= 0 ;
+     
+      (LHS = 0)
+     
+MaxLitres(Autumn)..  AvailMEToMilk(Autumn) - 3240*NumberCows(Autumn) =L= 0 ;
+     
+      (LHS = 0)
+     
+MaxLitres(Winter)..  AvailMEToMilk(Winter) - 3240*NumberCows(Winter) =L= 0 ;
+     
+      (LHS = 0)
+     
+MaxLitres(Spring)..  AvailMEToMilk(Spring) - 3240*NumberCows(Spring) =L= 0 ;
+     
+      (LHS = 0)
+     
+
+---- LabourLimit  =L=  Labour Balance
+
+LabourLimit(Summer)..  0.005*Fertiliser(Kikuyu) + 0.005*Fertiliser(Lucerne)
+     
+      + 6.6*NumberCows(Summer) - HireLab(Summer) =L= 1440 ; (LHS = 0)
+     
+LabourLimit(Autumn)..  5*PastureArea(Lucerne) + 5*PastureArea(Rye)
+     
+      + 6.6*NumberCows(Autumn) - HireLab(Autumn) =L= 1440 ; (LHS = 0)
+     
+LabourLimit(Winter)..  0.005*Fertiliser(Rye) + 6.6*NumberCows(Winter)
+     
+      - HireLab(Winter) =L= 1440 ; (LHS = 0)
+     
+LabourLimit(Spring)..  0.005*Fertiliser(Kikuyu) + 0.005*Fertiliser(Lucerne)
+     
+      + 0.005*Fertiliser(Rye) + 6.6*NumberCows(Spring) - HireLab(Spring) =L= 
+     1440 ; (LHS = 0)
+     
+
+---- CashLimit  =L=  Cash Balance
+
+CashLimit(Summer)..  0.2*Fertiliser(Kikuyu) + 0.2*Fertiliser(Lucerne)
+     
+      + 195*Grain(Summer) - 0.47*MilkToMkt(Summer) - 0.2*MilkToMan(Summer)
+     
+      + 111.6*NumberCows(Summer) + 12000*FixedCosts + 15*HireLab(Summer)
+     
+      + CashTransfer(Summer) - Overdraft(Summer) =L= 40000 ; (LHS = 0)
+     
+CashLimit(Autumn)..  250*PastureArea(Lucerne) + 250*PastureArea(Rye)
+     
+      + 200*Grain(Autumn) - 0.47*MilkToMkt(Autumn) - 0.27*MilkToMan(Autumn)
+     
+      + 111.6*NumberCows(Autumn) + 12000*FixedCosts + 15*HireLab(Autumn)
+     
+      - CashTransfer(Summer) + CashTransfer(Autumn) + 1.03*Overdraft(Summer)
+     
+      - Overdraft(Autumn) =L= 0 ; (LHS = 0)
+     
+CashLimit(Winter)..  0.2*Fertiliser(Rye) + 205*Grain(Winter)
+     
+      - 0.47*MilkToMkt(Winter) - 0.31*MilkToMan(Winter)
+     
+      + 111.6*NumberCows(Winter) + 12000*FixedCosts + 15*HireLab(Winter)
+     
+      - CashTransfer(Autumn) + CashTransfer(Winter) + 1.03*Overdraft(Autumn)
+     
+      - Overdraft(Winter) =L= 0 ; (LHS = 0)
+     
+CashLimit(Spring)..  0.2*Fertiliser(Kikuyu) + 0.2*Fertiliser(Lucerne)
+     
+      + 0.2*Fertiliser(Rye) + 210*Grain(Spring) - 0.47*MilkToMkt(Spring)
+     
+      - 0.26*MilkToMan(Spring) + 111.6*NumberCows(Spring) + 12000*FixedCosts
+     
+      + 15*HireLab(Spring) - CashTransfer(Winter) + CashTransfer(Spring)
+     
+      + 1.03*Overdraft(Winter) - Overdraft(Spring) =L= 0 ; (LHS = 0)
+     
+
+---- OverdraftLimit  =L=  Overdraft limit
+
+OverdraftLimit(Summer)..  Overdraft(Summer) =L= 60000 ; (LHS = 0)
+     
+OverdraftLimit(Autumn)..  Overdraft(Autumn) =L= 60000 ; (LHS = 0)
+     
+OverdraftLimit(Winter)..  Overdraft(Winter) =L= 60000 ; (LHS = 0)
+     
+OverdraftLimit(Spring)..  Overdraft(Spring) =L= 60000 ; (LHS = 0)
+     
+
+---- CowsEqual  =E=  Cows equal in all seasons
+
+CowsEqual(Summer)..  NumberCows(Summer) - NumberCows(Spring) =E= 0 ; (LHS = 0)
+     
+CowsEqual(Autumn)..  - NumberCows(Summer) + NumberCows(Autumn) =E= 0 ; (LHS = 0)
+     
+CowsEqual(Winter)..  - NumberCows(Autumn) + NumberCows(Winter) =E= 0 ; (LHS = 0)
+     
+CowsEqual(Spring)..  - NumberCows(Winter) + NumberCows(Spring) =E= 0 ; (LHS = 0)
+     
+
+---- CowsLimit  =L=  Not more than a certain number of cows
+
+CowsLimit(Spring)..  NumberCows(Spring) =L= 450 ; (LHS = 0)
+     
+
+---- FixedCostsLimit  =E=  Fixed costs equal one
+
+FixedCostsLimit..  FixedCosts =E= 1 ; (LHS = 0, INFES = 1 ***)
+     
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 4
+An LP of a dairy farm (Neal, 1999)
+Column Listing      SOLVE DairyFarm Using LP From line 240
+
+
+---- PastureArea  PastureArea planted to pasture(p)   (ha)
+
+PastureArea(Kikuyu)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       AreaSum
+    -9000       PastUse(Summer,Kikuyu)
+    -4500       PastUse(Autumn,Kikuyu)
+    -4500       PastUse(Winter,Kikuyu)
+    -9750       PastUse(Spring,Kikuyu)
+     -750       FertLimit(Kikuyu)
+
+PastureArea(Lucerne)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       AreaSum
+   -11025       PastUse(Summer,Lucerne)
+    -7200       PastUse(Autumn,Lucerne)
+    -7200       PastUse(Winter,Lucerne)
+   -11025       PastUse(Spring,Lucerne)
+     -750       FertLimit(Lucerne)
+        5       LabourLimit(Autumn)
+      250       CashLimit(Autumn)
+
+PastureArea(Rye)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       AreaSum
+    -9000       PastUse(Summer,Rye)
+    -4500       PastUse(Autumn,Rye)
+   -12375       PastUse(Winter,Rye)
+    -7875       PastUse(Spring,Rye)
+     -750       FertLimit(Rye)
+        5       LabourLimit(Autumn)
+      250       CashLimit(Autumn)
+
+
+---- Fertiliser  Fertiliser on pasture(p)            (kg?)
+
+Fertiliser(Kikuyu)
+                (.LO, .L, .UP = 0, 0, +INF)
+      -17.5     PastUse(Summer,Kikuyu)
+       -8.7     PastUse(Autumn,Kikuyu)
+       -8.7     PastUse(Winter,Kikuyu)
+      -18.9     PastUse(Spring,Kikuyu)
+        1       FertLimit(Kikuyu)
+        0.005   LabourLimit(Summer)
+        0.005   LabourLimit(Spring)
+        0.2     CashLimit(Summer)
+        0.2     CashLimit(Spring)
+
+Fertiliser(Lucerne)
+                (.LO, .L, .UP = 0, 0, +INF)
+      -21.4     PastUse(Summer,Lucerne)
+      -13.9     PastUse(Autumn,Lucerne)
+      -13.9     PastUse(Winter,Lucerne)
+      -21.4     PastUse(Spring,Lucerne)
+        1       FertLimit(Lucerne)
+        0.005   LabourLimit(Summer)
+        0.005   LabourLimit(Spring)
+        0.2     CashLimit(Summer)
+        0.2     CashLimit(Spring)
+
+Fertiliser(Rye)
+                (.LO, .L, .UP = 0, 0, +INF)
+      -17.5     PastUse(Summer,Rye)
+       -8.7     PastUse(Autumn,Rye)
+      -24       PastUse(Winter,Rye)
+      -15.3     PastUse(Spring,Rye)
+        1       FertLimit(Rye)
+        0.005   LabourLimit(Winter)
+        0.005   LabourLimit(Spring)
+        0.2     CashLimit(Winter)
+        0.2     CashLimit(Spring)
+
+
+---- PastMEToAvailME  Transfer pasture ME to available ME (ME)
+
+PastMEToAvailME(Summer,Kikuyu)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       PastUse(Summer,Kikuyu)
+       -1       ME(Summer)
+
+PastMEToAvailME(Summer,Lucerne)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       PastUse(Summer,Lucerne)
+       -1       ME(Summer)
+
+PastMEToAvailME(Summer,Rye)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       PastUse(Summer,Rye)
+       -1       ME(Summer)
+
+PastMEToAvailME(Autumn,Kikuyu)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       PastUse(Autumn,Kikuyu)
+       -1       ME(Autumn)
+
+REMAINING 8 ENTRIES SKIPPED
+
+---- Grain  Grain in season(s)                  (t)
+
+Grain(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+    -8000       ME(Summer)
+     1000       GrainLimit(Summer)
+      195       CashLimit(Summer)
+
+Grain(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+    -8000       ME(Autumn)
+     1000       GrainLimit(Autumn)
+      200       CashLimit(Autumn)
+
+Grain(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+    -8000       ME(Winter)
+     1000       GrainLimit(Winter)
+      205       CashLimit(Winter)
+
+Grain(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+    -8000       ME(Spring)
+     1000       GrainLimit(Spring)
+      210       CashLimit(Spring)
+
+
+---- AvailMEToMilk  Avalaible ME transfered to milk     (ME)
+
+AvailMEToMilk(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+        4.76    ME(Summer)
+       -1       MilkLitres(Summer)
+        1       MaxLitres(Summer)
+
+AvailMEToMilk(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+        4.76    ME(Autumn)
+       -1       MilkLitres(Autumn)
+        1       MaxLitres(Autumn)
+
+AvailMEToMilk(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+        4.76    ME(Winter)
+       -1       MilkLitres(Winter)
+        1       MaxLitres(Winter)
+
+AvailMEToMilk(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+        4.76    ME(Spring)
+       -1       MilkLitres(Spring)
+        1       MaxLitres(Spring)
+
+
+---- MilkToMkt  Milk transferred to market          (L)
+
+MilkToMkt(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Summer)
+        1       QuotaLimit(Summer)
+       -0.47    CashLimit(Summer)
+
+MilkToMkt(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Autumn)
+        1       QuotaLimit(Autumn)
+       -0.47    CashLimit(Autumn)
+
+MilkToMkt(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Winter)
+        1       QuotaLimit(Winter)
+       -0.47    CashLimit(Winter)
+
+MilkToMkt(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Spring)
+        1       QuotaLimit(Spring)
+       -0.47    CashLimit(Spring)
+
+
+---- MilkToMan  Milk transferred to manufacturing   (L)
+
+MilkToMan(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Summer)
+       -0.2     CashLimit(Summer)
+
+MilkToMan(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Autumn)
+       -0.27    CashLimit(Autumn)
+
+MilkToMan(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Winter)
+       -0.31    CashLimit(Winter)
+
+MilkToMan(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       MilkLitres(Spring)
+       -0.26    CashLimit(Spring)
+
+
+---- NumberCows  Number of cows in season(s)         (cows)
+
+NumberCows(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+    13440       ME(Summer)
+     -720       GrainLimit(Summer)
+    -3240       MaxLitres(Summer)
+        6.6     LabourLimit(Summer)
+      111.6     CashLimit(Summer)
+        1       CowsEqual(Summer)
+       -1       CowsEqual(Autumn)
+
+NumberCows(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+    13440       ME(Autumn)
+     -720       GrainLimit(Autumn)
+    -3240       MaxLitres(Autumn)
+        6.6     LabourLimit(Autumn)
+      111.6     CashLimit(Autumn)
+        1       CowsEqual(Autumn)
+       -1       CowsEqual(Winter)
+
+NumberCows(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+    13440       ME(Winter)
+     -720       GrainLimit(Winter)
+    -3240       MaxLitres(Winter)
+        6.6     LabourLimit(Winter)
+      111.6     CashLimit(Winter)
+        1       CowsEqual(Winter)
+       -1       CowsEqual(Spring)
+
+NumberCows(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+    13440       ME(Spring)
+     -720       GrainLimit(Spring)
+    -3240       MaxLitres(Spring)
+        6.6     LabourLimit(Spring)
+      111.6     CashLimit(Spring)
+       -1       CowsEqual(Summer)
+        1       CowsEqual(Spring)
+        1       CowsLimit(Spring)
+
+
+---- FixedCosts  Fixed costs                         (dol)
+
+FixedCosts
+                (.LO, .L, .UP = 0, 0, +INF)
+    12000       CashLimit(Summer)
+    12000       CashLimit(Autumn)
+    12000       CashLimit(Winter)
+    12000       CashLimit(Spring)
+        1       FixedCostsLimit
+
+
+---- HireLab  Hire of labour in season(s)         (hours)
+
+HireLab(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       LabourLimit(Summer)
+       15       CashLimit(Summer)
+
+HireLab(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       LabourLimit(Autumn)
+       15       CashLimit(Autumn)
+
+HireLab(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       LabourLimit(Winter)
+       15       CashLimit(Winter)
+
+HireLab(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       LabourLimit(Spring)
+       15       CashLimit(Spring)
+
+
+---- CashTransfer  Transfer of cash between seasons    (dol)
+
+CashTransfer(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       CashLimit(Summer)
+       -1       CashLimit(Autumn)
+
+CashTransfer(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       CashLimit(Autumn)
+       -1       CashLimit(Winter)
+
+CashTransfer(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       CashLimit(Winter)
+       -1       CashLimit(Spring)
+
+CashTransfer(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+        1       ObjFunction(Spring)
+        1       CashLimit(Spring)
+
+
+---- Overdraft  Overdraft and transfers (s)         (dol)
+
+Overdraft(Summer)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       CashLimit(Summer)
+        1.03    CashLimit(Autumn)
+        1       OverdraftLimit(Summer)
+
+Overdraft(Autumn)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       CashLimit(Autumn)
+        1.03    CashLimit(Winter)
+        1       OverdraftLimit(Autumn)
+
+Overdraft(Winter)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1       CashLimit(Winter)
+        1.03    CashLimit(Spring)
+        1       OverdraftLimit(Winter)
+
+Overdraft(Spring)
+                (.LO, .L, .UP = 0, 0, +INF)
+       -1.03    ObjFunction(Spring)
+       -1       CashLimit(Spring)
+        1       OverdraftLimit(Spring)
+
+
+---- Objective  Value of final cash balance         ($)
+
+Objective
+                (.LO, .L, .UP = -INF, 0, +INF)
+       -1       ObjFunction(Spring)
+
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 5
+An LP of a dairy farm (Neal, 1999)
+Model Statistics    SOLVE DairyFarm Using LP From line 240
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS          15     SINGLE EQUATIONS           55
+BLOCKS OF VARIABLES          13     SINGLE VARIABLES           52
+NON ZERO ELEMENTS           180
+
+
+GENERATION TIME      =        0.032 SECONDS      4 Mb  WIN221-144 Mar 14, 2006
+
+
+EXECUTION TIME       =        0.032 SECONDS      4 Mb  WIN221-144 Mar 14, 2006
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 6
+An LP of a dairy farm (Neal, 1999)
+Solution Report     SOLVE DairyFarm Using LP From line 240
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   DairyFarm           OBJECTIVE  Objective
+     TYPE    LP                  DIRECTION  MAXIMIZE
+     SOLVER  CONOPT              FROM LINE  240
+
+**** SOLVER STATUS     1 NORMAL COMPLETION         
+**** MODEL STATUS      1 OPTIMAL                   
+**** OBJECTIVE VALUE           387293.3839
+
+ RESOURCE USAGE, LIMIT          0.016      1000.000
+ ITERATION COUNT, LIMIT         6         10000
+ 
+ 
+    C O N O P T 3   x86/MS Windows version 3.14O-016-056
+    Copyright (C)   ARKI Consulting and Development A/S
+                    Bagsvaerdvej 246 A
+                    DK-2880 Bagsvaerd, Denmark
+ 
+ Using default options.
+ 
+ 
+ ** Warning **  The variance of the derivatives in the initial
+                point is large (= 4.3 ). A better initial
+                point, a better scaling, or better bounds on the
+                variables will probably help the optimization.
+ 
+ 
+ ** Optimal solution. There are no superbasic variables.
+ 
+ 
+ CONOPT time Total                            0.000 seconds
+   of which: Function evaluations             0.000 =  0.0%
+             1st Derivative evaluations       0.000 =  0.0%
+ 
+ Work length =    0.16 Mbytes
+    Estimate =    0.16 Mbytes
+    Max used =    0.08 Mbytes
+
+---- EQU ObjFunction  ObjectiveFunction -> max final cash balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Spring      .         .         .       -1.000      
+
+                       LOWER     LEVEL     UPPER    MARGINAL
+
+---- EQU AreaSum        -INF    150.000   150.000  1371.289      
+
+  AreaSum  PastureArea must be less than TotalArea
+
+---- EQU PastUse  Kikuyu production and use
+
+                  LOWER     LEVEL     UPPER    MARGINAL
+
+Summer.Kikuyu      -INF       .         .        0.015      
+Summer.Lucerne     -INF       .         .         EPS       
+Summer.Rye         -INF  -8.897E+4      .         .         
+Autumn.Kikuyu      -INF       .         .        0.057      
+Autumn.Lucerne     -INF       .         .        0.057      
+Autumn.Rye         -INF       .         .        0.057      
+Winter.Kikuyu      -INF       .         .        0.037      
+Winter.Lucerne     -INF       .         .        0.037      
+Winter.Rye         -INF       .         .        0.037      
+Spring.Kikuyu      -INF       .         .        0.013      
+Spring.Lucerne     -INF       .         .        0.013      
+Spring.Rye         -INF       .         .        0.013      
+
+---- EQU ME  ME balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF       .         .         EPS       
+Autumn     -INF       .         .        0.057      
+Winter     -INF       .         .        0.037      
+Spring     -INF       .         .        0.013      
+
+---- EQU MilkLitres  Milk Balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF       .         .        0.200      
+Autumn     -INF       .         .        0.270      
+Winter     -INF       .         .        0.310      
+Spring     -INF       .         .        0.260      
+
+---- EQU FertLimit  Fertiliser Balance
+
+           LOWER     LEVEL     UPPER    MARGINAL
+
+Kikuyu      -INF       .         .        0.920      
+Lucerne     -INF       .         .        1.175      
+Rye         -INF       .         .        1.177      
+
+---- EQU GrainLimit  Grain Balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF  -9.513E+4      .         .         
+Autumn     -INF       .         .        0.254      
+Winter     -INF       .         .        0.091      
+Spring     -INF  -9.513E+4      .         .         
+
+---- EQU QuotaLimit  Quota Balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF  2.0000E+5 2.0000E+5     0.270      
+Autumn     -INF  2.0000E+5 2.0000E+5     0.200      
+Winter     -INF  2.0000E+5 2.0000E+5     0.160      
+Spring     -INF  2.0000E+5 2.0000E+5     0.210      
+
+---- EQU MaxLitres  Limit on production per cow
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF       .         .        0.200      
+Autumn     -INF  -1.303E+5      .         .         
+Winter     -INF       .         .        0.134      
+Spring     -INF       .         .        0.200      
+
+---- EQU LabourLimit  Labour Balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF   1314.332  1440.000      .         
+Autumn     -INF   1440.000  1440.000    15.000      
+Winter     -INF    992.283  1440.000      .         
+Spring     -INF   1434.557  1440.000      .         
+
+---- EQU CashLimit  Cash Balance
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF  40000.000 40000.000     1.000      
+Autumn     -INF       .         .        1.000      
+Winter     -INF       .         .        1.000      
+Spring     -INF       .         .        1.000      
+
+---- EQU OverdraftLimit  Overdraft limit
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer     -INF       .    60000.000      .         
+Autumn     -INF       .    60000.000      .         
+Winter     -INF       .    60000.000      .         
+Spring     -INF       .    60000.000      .         
+
+---- EQU CowsEqual  Cows equal in all seasons
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .         .         .      536.400      
+Autumn      .         .         .         .         
+Winter      .         .         .      790.230      
+Spring      .         .         .      900.977      
+
+---- EQU CowsLimit  Not more than a certain number of cows
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Spring     -INF    132.130   450.000      .         
+
+                       LOWER     LEVEL     UPPER    MARGINAL
+
+---- EQU FixedCost~     1.000     1.000     1.000 -4.800E+4      
+
+  FixedCostsLimit  Fixed costs equal one
+
+---- VAR PastureArea  PastureArea planted to pasture(p)   (ha)
+
+           LOWER     LEVEL     UPPER    MARGINAL
+
+Kikuyu       .         .        +INF       .         
+Lucerne      .      117.940     +INF       .         
+Rye          .       32.060     +INF       .         
+
+---- VAR Fertiliser  Fertiliser on pasture(p)            (kg?)
+
+           LOWER     LEVEL     UPPER    MARGINAL
+
+Kikuyu       .         .        +INF       .         
+Lucerne      .    88454.874     +INF       .         
+Rye          .    24045.126     +INF       .         
+
+---- VAR PastMEToAvailME  Transfer pasture ME to available ME (ME)
+
+                  LOWER     LEVEL     UPPER    MARGINAL
+
+Summer.Kikuyu       .         .        +INF     -0.015      
+Summer.Lucerne      .    3.1932E+6     +INF       .         
+Summer.Rye          .    6.2036E+5     +INF       .         
+Autumn.Kikuyu       .         .        +INF       .         
+Autumn.Lucerne      .    2.0787E+6     +INF       .         
+Autumn.Rye          .    3.5346E+5     +INF       .         
+Winter.Kikuyu       .         .        +INF       .         
+Winter.Lucerne      .    2.0787E+6     +INF       .         
+Winter.Rye          .    9.7383E+5     +INF       .         
+Spring.Kikuyu       .         .        +INF       .         
+Spring.Lucerne      .    3.1932E+6     +INF       .         
+Spring.Rye          .    6.2036E+5     +INF       .         
+
+---- VAR Grain  Grain in season(s)                  (t)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .         .        +INF   -195.000      
+Autumn      .       95.134     +INF       .         
+Winter      .       95.134     +INF       .         
+Spring      .         .        +INF   -108.491      
+
+---- VAR AvailMEToMilk  Avalaible ME transfered to milk     (ME)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .    4.2810E+5     +INF       .         
+Autumn      .    2.9777E+5     +INF       .         
+Winter      .    4.2810E+5     +INF       .         
+Spring      .    4.2810E+5     +INF       .         
+
+---- VAR MilkToMkt  Milk transferred to market          (L)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .    2.0000E+5     +INF       .         
+Autumn      .    2.0000E+5     +INF       .         
+Winter      .    2.0000E+5     +INF       .         
+Spring      .    2.0000E+5     +INF       .         
+
+---- VAR MilkToMan  Milk transferred to manufacturing   (L)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .    2.2810E+5     +INF       .         
+Autumn      .    97772.159     +INF       .         
+Winter      .    2.2810E+5     +INF       .         
+Spring      .    2.2810E+5     +INF       .         
+
+---- VAR NumberCows  Number of cows in season(s)         (cows)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .      132.130     +INF       .         
+Autumn      .      132.130     +INF       .         
+Winter      .      132.130     +INF       .         
+Spring      .      132.130     +INF       .         
+
+                       LOWER     LEVEL     UPPER    MARGINAL
+
+---- VAR FixedCosts      .        1.000     +INF       .         
+
+  FixedCosts  Fixed costs                         (dol)
+
+---- VAR HireLab  Hire of labour in season(s)         (hours)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .         .        +INF    -15.000      
+Autumn      .      182.057     +INF       .         
+Winter      .         .        +INF    -15.000      
+Spring      .         .        +INF    -15.000      
+
+---- VAR CashTransfer  Transfer of cash between seasons    (dol)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .    1.3518E+5     +INF       .         
+Autumn      .    1.6958E+5     +INF       .         
+Winter      .    2.8323E+5     +INF       .         
+Spring      .    3.8729E+5     +INF       .         
+
+---- VAR Overdraft  Overdraft and transfers (s)         (dol)
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Summer      .         .        +INF     -0.030      
+Autumn      .         .        +INF     -0.030      
+Winter      .         .        +INF     -0.030      
+Spring      .         .        +INF     -0.030      
+
+                       LOWER     LEVEL     UPPER    MARGINAL
+
+---- VAR Objective      -INF  3.8729E+5     +INF       .         
+
+  Objective  Value of final cash balance         ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 7
+An LP of a dairy farm (Neal, 1999)
+E x e c u t i o n
+
+
+----    243 VARIABLE PastureArea.L  PastureArea planted to pasture(p)   (ha)
+
+Lucerne 117.940,    Rye      32.060
+
+
+
+EXECUTION TIME       =        0.016 SECONDS      3 Mb  WIN221-144 Mar 14, 2006
+
+
+USER: David Adamson                                  G050411:1546AP-WIN
+      The University of Queensland,  Risk & Sustainable ManagemenDC5245
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Documents and Settings\Neal\My Documents\gamsdir\Clareview Dairy L
+           inear Program.gms
+Output     C:\Documents and Settings\Neal\My Documents\gamsdir\Clareview Dairy L
+           inear Program.lst

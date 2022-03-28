@@ -1,0 +1,49 @@
+
+--- Job Clareview Dairy Linear Program.gms Start 04/20/06 10:56:09
+GAMS Rev 144  Copyright (C) 1987-2006 GAMS Development. All rights reserved
+Licensee: David Adamson                                  G050411:1546AP-WIN
+          The University of Queensland,  Risk & Sustainable ManagemenDC5245
+          License for teaching and research at degree granting institutions
+--- Starting compilation
+--- Clareview Dairy Linear Program.gms(25) 3 Mb
+--- .PG.csv(5) 3 Mb
+--- Clareview Dairy Linear Program.gms(239) 3 Mb
+--- Starting execution
+--- Clareview Dairy Linear Program.gms(7) 4 Mb
+--- Generating LP model DairyFarm
+--- Clareview Dairy Linear Program.gms(240) 4 Mb
+---   55 rows  52 columns  180 non-zeroes
+--- Executing CONOPT
+C O N O P T 3 Mar 15, 2006 WIN.CO.CO 22.1 016.056.041.VIS Library 314O     
+ 
+ 
+    C O N O P T 3   x86/MS Windows version 3.14O-016-056
+    Copyright (C)   ARKI Consulting and Development A/S
+                    Bagsvaerdvej 246 A
+                    DK-2880 Bagsvaerd, Denmark
+ 
+ Using default options.
+ 
+ Reading Data
+ 
+   Iter Phase Ninf   Infeasibility   RGmax    NSB   Step InItr MX OK
+      0   0        1.0000000000E+00 (Input point)
+                                Pre-triangular equations:        1
+                                Post-triangular equations:       1
+      1   0        3.6000000000E+04 (After pre-processing)
+      2   0        4.3945312500E+00 (After scaling)
+ 
+ ** Feasible solution. Value of objective =   -8240.00000000
+ 
+   Iter Phase Ninf     Objective     RGmax    NSB   Step InItr MX OK
+      6   3        3.8729338391E+05 0.0E+00     0
+ 
+ ** Optimal solution. There are no superbasic variables.
+ 
+--- Restarting execution
+--- Clareview Dairy Linear Program.gms(240) 0 Mb
+--- Reading solution for model DairyFarm
+--- Executing after solve
+--- Clareview Dairy Linear Program.gms(243) 3 Mb
+*** Status: Normal completion
+--- Job Clareview Dairy Linear Program.gms Stop 04/20/06 10:56:09 elapsed 0:00:00.281
