@@ -1,0 +1,22 @@
+[PROJECT]
+
+[RP:CREATING HONS THESISDAIRY LINEAR PROGRAM]
+1=
+
+[RP:CLAREVIEW DAIRY LINEAR PROGRAM]
+1=
+
+[MRUFILES]
+1=C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_assignment\Clareview Dairy LP (4th year)\DairyFarm_p.gdx
+2=C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_assignment\Clareview Dairy LP (4th year)\Clareview Dairy Linear Program.gms
+3=C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_thesis_1999\Hons thesis Dairy LP\Creating Hons ThesisDairy Linear Program.gms
+
+[OPENWINDOW_1]
+MAXIM=1
+TOP=0
+LEFT=0
+HEIGHT=395
+WIDTH=520
+FILE0=C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_assignment\Clareview Dairy LP (4th year)\Clareview Dairy Linear Program.gms
+FILE1=C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_assignment\Clareview Dairy LP (4th year)\Clareview Dairy Linear Program.lst
+FILE2=C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_assignment\Clareview Dairy LP (4th year)\Clareview Dairy Linear Program.gms

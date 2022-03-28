@@ -1,23 +1,21 @@
 
---- Job Clareview Dairy Linear Program.gms Start 04/20/06 10:56:09
-GAMS Rev 144  Copyright (C) 1987-2006 GAMS Development. All rights reserved
-Licensee: David Adamson                                  G050411:1546AP-WIN
-          The University of Queensland,  Risk & Sustainable ManagemenDC5245
+GAMS Rev 140  Copyright (C) 1987-2004 GAMS Development. All rights reserved
+Licensee: Mark Neal                                      G060515:1514AP-WIN
+          University of Queensland, The School of Economics          DC5881
           License for teaching and research at degree granting institutions
 --- Starting compilation
---- Clareview Dairy Linear Program.gms(25) 3 Mb
---- .PG.csv(5) 3 Mb
+--- .PG.csv(5) 3 Mb                            
 --- Clareview Dairy Linear Program.gms(239) 3 Mb
 --- Starting execution
---- Clareview Dairy Linear Program.gms(7) 4 Mb
---- Generating LP model DairyFarm
 --- Clareview Dairy Linear Program.gms(240) 4 Mb
----   55 rows  52 columns  180 non-zeroes
+--- Generating model DairyFarm
+--- Clareview Dairy Linear Program.gms(242) 4 Mb
+---    55 rows, 52 columns, and 180 non-zeroes.
 --- Executing CONOPT
-C O N O P T 3 Mar 15, 2006 WIN.CO.CO 22.1 016.056.041.VIS Library 314O     
+C O N O P T 3 Nov 11, 2004 WIN.CO.CO 21.5 015.052.041.VIS Library 314E     
  
  
-    C O N O P T 3   x86/MS Windows version 3.14O-016-056
+    C O N O P T 3   Intel /MS Window version 3.14E-015-052
     Copyright (C)   ARKI Consulting and Development A/S
                     Bagsvaerdvej 246 A
                     DK-2880 Bagsvaerd, Denmark
@@ -36,14 +34,13 @@ C O N O P T 3 Mar 15, 2006 WIN.CO.CO 22.1 016.056.041.VIS Library 314O
  ** Feasible solution. Value of objective =   -8240.00000000
  
    Iter Phase Ninf     Objective     RGmax    NSB   Step InItr MX OK
-      6   3        3.8729338391E+05 0.0E+00     0
+      5   3        3.8729338391E+05 0.0E+00     0
  
  ** Optimal solution. There are no superbasic variables.
  
 --- Restarting execution
---- Clareview Dairy Linear Program.gms(240) 0 Mb
+--- Clareview Dairy Linear Program.gms(242) 0 Mb
 --- Reading solution for model DairyFarm
---- Executing after solve
---- Clareview Dairy Linear Program.gms(243) 3 Mb
+--- GDX Point C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_neal_assignment\Clareview Dairy LP (4th year)\DairyFarm_p.gdx
+--- Clareview Dairy Linear Program.gms(244) 3 Mb
 *** Status: Normal completion
---- Job Clareview Dairy Linear Program.gms Stop 04/20/06 10:56:09 elapsed 0:00:00.281

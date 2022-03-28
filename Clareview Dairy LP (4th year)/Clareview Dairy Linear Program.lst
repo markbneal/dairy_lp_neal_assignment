@@ -1,4 +1,4 @@
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 1
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 1
 An LP of a dairy farm (Neal, 1999)
 C o m p i l a t i o n
 
@@ -25,7 +25,8 @@ C o m p i l a t i o n
   21   
   22  * Here is an example of reading data from an excel file saved in csv
   23  Table PG(s,p)  Pasture growth (ME units?)
-INCLUDE    C:\Documents and Settings\Neal\My Documents\gamsdir\PG.csv
+INCLUDE    C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_ne
+           al_assignment\Clareview Dairy LP (4th year)\PG.csv
   26  PG,Kikuyu,Lucerne,Rye
   27  Summer,9000,11025,9000
   28  Autumn,4500,7200,4500
@@ -253,29 +254,32 @@ INCLUDE    C:\Documents and Settings\Neal\My Documents\gamsdir\PG.csv
  237   
  238  Model DairyFarm  / All / ;
  239   
- 240  Solve DairyFarm using lp maximizing Objective;
+ 240  Option SAVEPOINT=1;
  241   
- 242   
- 243  Display PastureArea.l;
- 244   
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 2
+ 242  Solve DairyFarm using lp maximizing Objective;
+ 243   
+ 244  Display PastureArea.l;
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 2
 An LP of a dairy farm (Neal, 1999)
 Include File Summary
 
 
    SEQ   GLOBAL TYPE      PARENT   LOCAL  FILENAME
 
-     1        1 INPUT          0       0  C:\Documents and Settings\Neal\My Docu
-                                          ments\gamsdir\Clareview Dairy Linear P
-                                          rogram.gms
-     2       25 INCLUDE        1      25  .C:\Documents and Settings\Neal\My Doc
-                                           uments\gamsdir\PG.csv
+     1        1 INPUT          0       0  C:\Users\nealm\OneDrive - DairyNZ Limi
+                                          ted\Desktop\dairynz\dairy_lp_neal_assi
+                                          gnment\Clareview Dairy LP (4th year)\C
+                                          lareview Dairy Linear Program.gms
+     2       25 INCLUDE        1      25  .C:\Users\nealm\OneDrive - DairyNZ Lim
+                                           ited\Desktop\dairynz\dairy_lp_neal_as
+                                           signment\Clareview Dairy LP (4th year
+                                           )\PG.csv
 
 
-COMPILATION TIME     =        0.015 SECONDS      3 Mb  WIN221-144 Mar 14, 2006
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 3
+COMPILATION TIME     =        0.000 SECONDS    3.2 Mb  WIN215-140 Nov 11, 2004
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 3
 An LP of a dairy farm (Neal, 1999)
-Equation Listing    SOLVE DairyFarm Using LP From line 240
+Equation Listing    SOLVE DairyFarm Using LP From line 242
 
 
 ---- ObjFunction  =E=  ObjectiveFunction -> max final cash balance
@@ -513,9 +517,9 @@ CowsLimit(Spring)..  NumberCows(Spring) =L= 450 ; (LHS = 0)
 
 FixedCostsLimit..  FixedCosts =E= 1 ; (LHS = 0, INFES = 1 ***)
      
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 4
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 4
 An LP of a dairy farm (Neal, 1999)
-Column Listing      SOLVE DairyFarm Using LP From line 240
+Column Listing      SOLVE DairyFarm Using LP From line 242
 
 
 ---- PastureArea  PastureArea planted to pasture(p)   (ha)
@@ -853,42 +857,42 @@ Objective
                 (.LO, .L, .UP = -INF, 0, +INF)
        -1       ObjFunction(Spring)
 
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 5
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 5
 An LP of a dairy farm (Neal, 1999)
-Model Statistics    SOLVE DairyFarm Using LP From line 240
+Model Statistics    SOLVE DairyFarm Using LP From line 242
 
 
 MODEL STATISTICS
 
-BLOCKS OF EQUATIONS          15     SINGLE EQUATIONS           55
-BLOCKS OF VARIABLES          13     SINGLE VARIABLES           52
-NON ZERO ELEMENTS           180
+BLOCKS OF EQUATIONS      15     SINGLE EQUATIONS       55
+BLOCKS OF VARIABLES      13     SINGLE VARIABLES       52
+NON ZERO ELEMENTS       180
 
 
-GENERATION TIME      =        0.032 SECONDS      4 Mb  WIN221-144 Mar 14, 2006
+GENERATION TIME      =        0.015 SECONDS    4.0 Mb  WIN215-140 Nov 11, 2004
 
 
-EXECUTION TIME       =        0.032 SECONDS      4 Mb  WIN221-144 Mar 14, 2006
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 6
+EXECUTION TIME       =        0.015 SECONDS    4.0 Mb  WIN215-140 Nov 11, 2004
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 6
 An LP of a dairy farm (Neal, 1999)
-Solution Report     SOLVE DairyFarm Using LP From line 240
+Solution Report     SOLVE DairyFarm Using LP From line 242
 
 
                S O L V E      S U M M A R Y
 
      MODEL   DairyFarm           OBJECTIVE  Objective
      TYPE    LP                  DIRECTION  MAXIMIZE
-     SOLVER  CONOPT              FROM LINE  240
+     SOLVER  CONOPT              FROM LINE  242
 
 **** SOLVER STATUS     1 NORMAL COMPLETION         
 **** MODEL STATUS      1 OPTIMAL                   
 **** OBJECTIVE VALUE           387293.3839
 
  RESOURCE USAGE, LIMIT          0.016      1000.000
- ITERATION COUNT, LIMIT         6         10000
+ ITERATION COUNT, LIMIT         5         10000
  
  
-    C O N O P T 3   x86/MS Windows version 3.14O-016-056
+    C O N O P T 3   Intel /MS Window version 3.14E-015-052
     Copyright (C)   ARKI Consulting and Development A/S
                     Bagsvaerdvej 246 A
                     DK-2880 Bagsvaerd, Denmark
@@ -905,7 +909,7 @@ Solution Report     SOLVE DairyFarm Using LP From line 240
  ** Optimal solution. There are no superbasic variables.
  
  
- CONOPT time Total                            0.000 seconds
+ CONOPT time Total                            0.016 seconds
    of which: Function evaluations             0.000 =  0.0%
              1st Derivative evaluations       0.000 =  0.0%
  
@@ -929,16 +933,16 @@ Spring      .         .         .       -1.000
 
                   LOWER     LEVEL     UPPER    MARGINAL
 
-Summer.Kikuyu      -INF       .         .        0.015      
-Summer.Lucerne     -INF       .         .         EPS       
-Summer.Rye         -INF  -8.897E+4      .         .         
+Summer.Kikuyu      -INF       .         .         EPS       
+Summer.Lucerne     -INF  -8.897E+4      .         .         
+Summer.Rye         -INF       .         .         EPS       
 Autumn.Kikuyu      -INF       .         .        0.057      
 Autumn.Lucerne     -INF       .         .        0.057      
 Autumn.Rye         -INF       .         .        0.057      
 Winter.Kikuyu      -INF       .         .        0.037      
 Winter.Lucerne     -INF       .         .        0.037      
 Winter.Rye         -INF       .         .        0.037      
-Spring.Kikuyu      -INF       .         .        0.013      
+Spring.Kikuyu      -INF       .         .        0.027      
 Spring.Lucerne     -INF       .         .        0.013      
 Spring.Rye         -INF       .         .        0.013      
 
@@ -964,7 +968,7 @@ Spring     -INF       .         .        0.260
 
            LOWER     LEVEL     UPPER    MARGINAL
 
-Kikuyu      -INF       .         .        0.920      
+Kikuyu      -INF       .         .        0.919      
 Lucerne     -INF       .         .        1.175      
 Rye         -INF       .         .        1.177      
 
@@ -1026,10 +1030,10 @@ Spring     -INF       .    60000.000      .
 
           LOWER     LEVEL     UPPER    MARGINAL
 
-Summer      .         .         .      536.400      
-Autumn      .         .         .         .         
-Winter      .         .         .      790.230      
-Spring      .         .         .      900.977      
+Summer      .         .         .     -253.830      
+Autumn      .         .         .     -790.230      
+Winter      .         .         .         .         
+Spring      .         .         .      110.747      
 
 ---- EQU CowsLimit  Not more than a certain number of cows
 
@@ -1063,16 +1067,16 @@ Rye          .    24045.126     +INF       .
 
                   LOWER     LEVEL     UPPER    MARGINAL
 
-Summer.Kikuyu       .         .        +INF     -0.015      
-Summer.Lucerne      .    3.1932E+6     +INF       .         
-Summer.Rye          .    6.2036E+5     +INF       .         
+Summer.Kikuyu       .         .        +INF       .         
+Summer.Lucerne      .    3.1043E+6     +INF       .         
+Summer.Rye          .    7.0933E+5     +INF       .         
 Autumn.Kikuyu       .         .        +INF       .         
 Autumn.Lucerne      .    2.0787E+6     +INF       .         
 Autumn.Rye          .    3.5346E+5     +INF       .         
 Winter.Kikuyu       .         .        +INF       .         
 Winter.Lucerne      .    2.0787E+6     +INF       .         
 Winter.Rye          .    9.7383E+5     +INF       .         
-Spring.Kikuyu       .         .        +INF       .         
+Spring.Kikuyu       .         .        +INF     -0.014      
 Spring.Lucerne      .    3.1932E+6     +INF       .         
 Spring.Rye          .    6.2036E+5     +INF       .         
 
@@ -1164,28 +1168,33 @@ Spring      .         .        +INF     -0.030
 **** REPORT SUMMARY :        0     NONOPT
                              0 INFEASIBLE
                              0  UNBOUNDED
-GAMS Rev 144  x86/MS Windows                            04/20/06 10:56:09 Page 7
+
+**** Saved point C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy
+               _lp_neal_assignment\Clareview Dairy LP (4th year)\DairyFarm_p.gdx
+GAMS Rev 140  Intel /MS Window                          03/29/22 11:37:59 Page 7
 An LP of a dairy farm (Neal, 1999)
 E x e c u t i o n
 
 
-----    243 VARIABLE PastureArea.L  PastureArea planted to pasture(p)   (ha)
+----    244 VARIABLE PastureArea.L  PastureArea planted to pasture(p)   (ha)
 
 Lucerne 117.940,    Rye      32.060
 
 
 
-EXECUTION TIME       =        0.016 SECONDS      3 Mb  WIN221-144 Mar 14, 2006
+EXECUTION TIME       =        0.047 SECONDS    2.9 Mb  WIN215-140 Nov 11, 2004
 
 
-USER: David Adamson                                  G050411:1546AP-WIN
-      The University of Queensland,  Risk & Sustainable ManagemenDC5245
+USER: Mark Neal                                      G060515:1514AP-WIN
+      University of Queensland, The School of Economics          DC5881 
       License for teaching and research at degree granting institutions
 
 
 **** FILE SUMMARY
 
-Input      C:\Documents and Settings\Neal\My Documents\gamsdir\Clareview Dairy L
-           inear Program.gms
-Output     C:\Documents and Settings\Neal\My Documents\gamsdir\Clareview Dairy L
-           inear Program.lst
+Input      C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_ne
+           al_assignment\Clareview Dairy LP (4th year)\Clareview Dairy Linear Pr
+           ogram.gms
+Output     C:\Users\nealm\OneDrive - DairyNZ Limited\Desktop\dairynz\dairy_lp_ne
+           al_assignment\Clareview Dairy LP (4th year)\Clareview Dairy Linear Pr
+           ogram.lst

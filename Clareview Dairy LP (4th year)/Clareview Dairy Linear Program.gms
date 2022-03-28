@@ -232,8 +232,8 @@ FixedCostsLimit..
 
 Model DairyFarm  / All / ;
 
+Option SAVEPOINT=1;
+
 Solve DairyFarm using lp maximizing Objective;
-
-
+                     
 Display PastureArea.l;
-
